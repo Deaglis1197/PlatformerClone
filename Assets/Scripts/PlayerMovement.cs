@@ -6,30 +6,32 @@ using UnityEngine.InputSystem;
 
 public class PlayerMovement : MonoBehaviour
 {
+    
     [SerializeField] float runSpeed = 10f;
     [SerializeField] float jumpPower = 10f;
     [SerializeField] float climbSpeed = 10f;
     Animator characterAnimator;
+    Animation climbingAnimation;
     Vector2 moveInput;
     Rigidbody2D theRb2d;
-    CapsuleCollider2D playerCapsuleCollider2D;
+    BoxCollider2D myFeetCollider2D;
     float gravityScaleAtStart;
     void Start()
     {
         GetRigidBody();
         GetAnimator();
-        GetCapsuleCollider2d();
         GetGravityScaleAtStart();
+        GetBoxCollider();
+    }
+
+    private void GetBoxCollider()
+    {
+        myFeetCollider2D = GetComponent<BoxCollider2D>();
     }
 
     private void GetGravityScaleAtStart()
     {
         gravityScaleAtStart = theRb2d.gravityScale;
-    }
-
-    private void GetCapsuleCollider2d()
-    {
-        playerCapsuleCollider2D = GetComponent<CapsuleCollider2D>();
     }
 
     private void GetAnimator()
@@ -43,7 +45,7 @@ public class PlayerMovement : MonoBehaviour
     }
     void OnJump(InputValue value)
     {
-        if (!playerCapsuleCollider2D.IsTouchingLayers(LayerMask.GetMask("Ground"))) return;
+        if (!myFeetCollider2D.IsTouchingLayers(LayerMask.GetMask("Ground"))) return;
 
         if (value.isPressed)
         {
@@ -58,14 +60,22 @@ public class PlayerMovement : MonoBehaviour
     }
     private void ClimbLadder()
     {
-        if (!playerCapsuleCollider2D.IsTouchingLayers(LayerMask.GetMask("Climbing")))
+        if (!myFeetCollider2D.IsTouchingLayers(LayerMask.GetMask("Climbing")))
         {
             theRb2d.gravityScale = 4;
+            characterAnimator.SetBool("isClimbing", false);
+            characterAnimator.speed = 1;
             return;
         }
         Vector2 climbVelocity = new Vector2(theRb2d.velocity.x, moveInput.y * climbSpeed);
         theRb2d.velocity = climbVelocity;
         theRb2d.gravityScale = 0;
+        //this part is different from course
+        if (!myFeetCollider2D.IsTouchingLayers(LayerMask.GetMask("Ground")))
+        {
+            characterAnimator.SetBool("isClimbing", true);
+            characterAnimator.speed = Mathf.Abs(moveInput.y);
+        }
     }
 
     private void FlipSprite()
@@ -86,6 +96,5 @@ public class PlayerMovement : MonoBehaviour
     void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
-        Debug.Log(moveInput);
     }
 }
