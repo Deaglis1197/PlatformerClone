@@ -13,6 +13,7 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] Vector2 deathKick = new Vector2(10f, 10f);
     [SerializeField] GameObject bullet;
     [SerializeField] Transform gun;
+    [SerializeField] 
     Animator characterAnimator;
     Animation climbingAnimation;
     Vector2 moveInput;
@@ -124,12 +125,15 @@ public class PlayerMovement : MonoBehaviour
             isAlive = false;
             characterAnimator.SetTrigger("Dying");
             if (!myBodyCollider2D.IsTouchingLayers(LayerMask.GetMask("Water")))
+            {
                 theRb2d.velocity = deathKick;
+            }
             else
             {
                 theRb2d.gravityScale=0.25f;
                 theRb2d.velocity = new Vector2(Mathf.Sign(theRb2d.velocity.x),1);
             }
+            FindObjectOfType<GameSession>().ProcessPlayerDeath();
         }
     }
 }

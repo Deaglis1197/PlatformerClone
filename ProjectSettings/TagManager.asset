@@ -57,7 +57,7 @@ TagManager:
   - name: Enemy
     uniqueID: 3474212533
     locked: 0
-  - name: Exit
+  - name: Interactables
     uniqueID: 375567101
     locked: 0
   - name: Player
